@@ -4,8 +4,13 @@
 #include <ctime>
 #include <string>
 
-#define MINES 1
+#define MINES 10
 #define BOARD_SIZE 9
+#define OFFSETS { \
+    {-1, -1}, {-1, 0}, {-1, 1}, \
+    { 0, -1},          { 0, 1}, \
+    { 1, -1}, { 1, 0}, { 1, 1}  \
+}
 
 int squaresStillHidden = BOARD_SIZE * BOARD_SIZE;
 
@@ -34,7 +39,7 @@ public:
             int randomY = rand()%rows;
 
             if(not placesMineInStartSquare(x, y, randomX, randomY)) {
-                if (!hasMine(randomX, randomY)) {
+                if (!board[randomX][randomY].containsMine) {
 
                     board[randomX][randomY].containsMine = true;
                     mineCount++;
@@ -44,45 +49,6 @@ public:
         };
     };
 
-private:
-    int rows;
-    int cols;
-    int totalMines;
-    std::vector<std::vector<Cell>> board;
-
-    // Determines if cell is in the bounds of the board
-    bool isValidLocation(int x, int y) {
-        return (0 <= x and x < rows) and (0 <= y and y < cols);
-    }
-
-
-    // Makes sure mines not placed in start square. Returns true if position in start square, false otherwise
-    bool placesMineInStartSquare(int x, int y, int x_placed, int y_placed) {
-        return (x - 1 <= x_placed and x_placed <= x + 1) and
-            (y - 1 <= y_placed and y_placed <= y + 1);
-    }
-
-
-    // Determines if cell contains a mine
-    bool hasMine(int x, int y) {
-        return board[x][y].containsMine;
-    };
-
-    // Increments the surrounding mine count for a cell
-    void incrementSurroundingMineCount(int x, int y) {
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                if(i == 0 and j == 0) {
-                    continue;
-                };
-                if(isValidLocation(x + i, y + j)) {
-                    board[x+i][y+j].surroundingMines++;
-                };
-            };
-        };
-    };
-
-public:
     // Marks a cell as flagged
     void flagCell(int x, int y) {
         board[x][y].isFlagged = true;
@@ -90,30 +56,22 @@ public:
 
     // Reveals a cell and surrounding cells if the cell has a mine, returns true if the cell contains mines, false otherwise
     bool revealCell(int x, int y) {
-    // Log the cell being revealed
-    std::cout << "Revealing cell: " << x << " " << y << std::endl;
+        // Mark the cell as revealed
+        board[x][y].isRevealed = true;
+        squaresStillHidden--; // Decrement the counter only once
 
-    // Mark the cell as revealed
-    board[x][y].isRevealed = true;
-    squaresStillHidden--; // Decrement the counter only once
+        // If the cell contains a mine, return true (game over)
+        if (board[x][y].containsMine) {
+            std::cout << "Mine hit" << std::endl;
+            return true;
+        }
+        // If the cell has no surrounding mines, reveal neighbors
+        if (board[x][y].surroundingMines == 0) {
+            const std::pair<int, int> offsets[] = OFFSETS;
 
-    // If the cell contains a mine, return true (game over)
-    if (board[x][y].containsMine) {
-        std::cout << "Mine hit" << std::endl;
-        return true;
-    }
-
-    // If the cell has no surrounding mines, reveal neighbors
-    if (board[x][y].surroundingMines == 0) {
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                // Skip the current cell
-                if (i == 0 && j == 0) {
-                    continue;
-                }
-
-                int neighborX = x + i;
-                int neighborY = y + j;
+            for (const auto& offset : offsets) {
+                int neighborX = x + offset.first;
+                int neighborY = y + offset.second;
 
                 // Check if the neighbor is valid and not already revealed
                 if (isValidLocation(neighborX, neighborY) && !board[neighborX][neighborY].isRevealed) {
@@ -121,12 +79,9 @@ public:
                 }
             }
         }
+        // If no mine was hit, return false
+        return false;
     }
-
-    // If no mine was hit, return false
-    return false;
-}
-
 
     // Returns the number of mines surrounding a cell
     int checkSurroundingCellCounts(int x, int y) {
@@ -183,6 +138,67 @@ public:
                 };
             };
             std::cout << rowString << std::endl;
+        };
+    };
+
+    // Returns true if all neighbours of a cell are known, no further solving possible
+    bool allNeighboursKnown (int x, int y) {
+        const std::pair<int, int> offsets[] = OFFSETS;
+        for (const auto& offset: offsets) {
+            int dx = offset.first;
+            int dy = offset.second;
+            if(isValidLocation(x + dx, y + dy)) {
+                if (board[x+dx][y+dy].isRevealed == false and board[x+dx][y+dy].isFlagged == false) {
+                    return false;
+                };
+            };
+        };
+        return true;
+    };
+
+    // Returns true if all neighbours of a cell are unknown, no further solving possible
+    bool allNeighboursUnknown (int x, int y) {
+        const std::pair<int, int> offsets[] = OFFSETS;
+        for (const auto& offset: offsets) {
+            int dx = offset.first;
+            int dy = offset.second;
+            if(isValidLocation(x + dx, y + dy)) {
+                if (board[x+dx][y+dy].isRevealed == true or board[x+dx][y+dy].isFlagged == true) {
+                    return false;
+                };
+            };
+        };
+        return true;
+    };
+
+private:
+    int rows;
+    int cols;
+    int totalMines;
+    std::vector<std::vector<Cell>> board;
+
+    // Determines if cell is in the bounds of the board
+    bool isValidLocation(int x, int y) {
+        return (0 <= x and x < rows) and (0 <= y and y < cols);
+    }
+
+
+    // Makes sure mines not placed in start square. Returns true if position in start square, false otherwise
+    bool placesMineInStartSquare(int x, int y, int x_placed, int y_placed) {
+        return (x - 1 <= x_placed and x_placed <= x + 1) and
+            (y - 1 <= y_placed and y_placed <= y + 1);
+    }
+
+    // Increments the surrounding mine count for a cell
+    void incrementSurroundingMineCount(int x, int y) {
+        const std::pair<int, int> offsets[] = OFFSETS;
+
+        for (const auto& offset: offsets) {
+            int dx = offset.first;
+            int dy = offset.second;
+            if(isValidLocation(x + dx, y + dy)) {
+                        board[x+dx][y+dy].surroundingMines++;
+                    };
         };
     };
 };
