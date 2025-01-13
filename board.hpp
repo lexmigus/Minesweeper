@@ -49,9 +49,88 @@ public:
         };
     };
 
-    // Marks a cell as flagged
-    void flagCell(int x, int y) {
+    // Returns false if the cell is revealed, true otherwise
+    bool isHidden(int x, int y) {
+        return board[x][y].isRevealed == false;
+    };
+
+    // Returns true if the cell is revealed, false otherwise
+    bool isRevealed(int x, int y) {
+        return board[x][y].isRevealed == true;
+    };
+
+    // Sets the Flag of a cell to true, for solver only
+    void setFlag(int x, int y) {
         board[x][y].isFlagged = true;
+    };
+
+    // Marks a cell as flagged, or unflags it if already flagged
+    void toggleFlag(int x, int y) {
+        if (board[x][y].isFlagged == false) {
+            board[x][y].isFlagged = true;
+        } else {
+            board[x][y].isFlagged = false;
+        };
+    };
+
+    // Reveals all neighbors of a cell, for trivial solver logic
+    void revealAllNeighbors(int x, int y) {
+        const std::pair<int, int> offsets[] = OFFSETS;
+        for (const auto& offset: offsets) {
+            int dx = offset.first;
+            int dy = offset.second;
+            if(isValidLocation(x + dx, y + dy)) {
+                if (board[x+dx][y+dy].isRevealed == false) {
+                    revealCell(x+dx, y+dy);
+                };
+            };
+        };
+    };
+
+    // Flags all neighbors of a cell, for trivial solver logic
+    void flagAllNeighbors(int x, int y) {
+        const std::pair<int, int> offsets[] = OFFSETS;
+        for (const auto& offset: offsets) {
+            int dx = offset.first;
+            int dy = offset.second;
+            if(isValidLocation(x + dx, y + dy)) {
+                if (board[x+dx][y+dy].isFlagged == false) {
+                    toggleFlag(x+dx, y+dy);
+                };
+            };
+        };
+    };
+
+    // Counts the number of flags surrounding a cell, for solver logic
+    int countSurroundingFlags (int x, int y) {
+        int count = 0;
+        const std::pair<int, int> offsets[] = OFFSETS;
+        for (const auto& offset: offsets) {
+            int dx = offset.first;
+            int dy = offset.second;
+            if(isValidLocation(x + dx, y + dy)) {
+                if (board[x+dx][y+dy].isFlagged == true) {
+                    count++;
+                };
+            };
+        };
+        return count;
+    };
+
+    // Counts the number of hidden cells surrounding a cell, for solver logic
+    int countSurroundingHidden (int x, int y) {
+        int count = 0;
+        const std::pair<int, int> offsets[] = OFFSETS;
+        for (const auto& offset: offsets) {
+            int dx = offset.first;
+            int dy = offset.second;
+            if(isValidLocation(x + dx, y + dy)) {
+                if (board[x+dx][y+dy].isRevealed == false) {
+                    count++;
+                };
+            };
+        };
+        return count;
     };
 
     // Reveals a cell and surrounding cells if the cell has a mine, returns true if the cell contains mines, false otherwise
