@@ -1,5 +1,17 @@
 #include "board.hpp"
 
+//solve runs the high level solving logic
+void solve(Board& board) {
+    for (int i=0; i<5; i++){
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                solveCell(board, {i, j});
+            }
+        }
+        board.printBoard();
+    }
+}
+
 //solveCell runs the solving logic for a single cell
 void solveCell(Board& board, std::pair<int, int> cell) {
     int x = cell.first;
