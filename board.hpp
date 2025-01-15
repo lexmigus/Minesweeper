@@ -136,7 +136,6 @@ public:
             int dy = offset.second;
             if(isValidLocation(x + dx, y + dy)) {
                 if (board[x+dx][y+dy].isRevealed == false and board[x+dx][y+dy].isFlagged == false) {
-                if (board[x+dx][y+dy].isRevealed == false and board[x+dx][y+dy].isFlagged == false) {
                     count++;
                 };
             };
@@ -168,7 +167,7 @@ public:
                     revealCell(neighborX, neighborY); // Recursive call
                 }
             }
-        }
+        };
         // If no mine was hit, return false
         return false;
     }
