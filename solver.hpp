@@ -10,28 +10,11 @@ void solveCell(Board& board, std::pair<int, int> cell) {
     else {
         int surroundingFlags = board.countSurroundingFlags(x, y);
         int surroundingHidden = board.countSurroundingHidden(x, y);
-        int numberOfMines = board.checkSurroundingCellCounts(x, y);
-
-        if (surroundingFlags == numberOfMines) {
-            std::cout << "revealing" << std::endl;
-            board.forAllNeighbors(x, y, [&](int nx, int ny) { board.revealNeighbors(nx, ny); });
+        if (surroundingFlags == board.checkSurroundingCellCounts(x, y)) {
+            board.revealAllNeighbors(x, y);
         }
-        else if (surroundingFlags + surroundingHidden == numberOfMines) {
-            std::cout << "flagging" << std::endl;
-            board.forAllNeighbors(x, y, [&](int nx, int ny) { board.flagNeighbors(nx, ny); });
+        else if (surroundingFlags + surroundingHidden == board.checkSurroundingCellCounts(x, y)) {
+            board.flagAllNeighbors(x, y);
         }
-    }
-}
-
-
-//solve runs the high level solving logic
-void solve(Board& board) {
-    for (int i=0; i<5; i++){
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                solveCell(board, {i, j});
-            }
-        }
-        board.printBoard();
     }
 }

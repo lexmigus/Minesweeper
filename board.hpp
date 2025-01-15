@@ -136,6 +136,7 @@ public:
             int dy = offset.second;
             if(isValidLocation(x + dx, y + dy)) {
                 if (board[x+dx][y+dy].isRevealed == false and board[x+dx][y+dy].isFlagged == false) {
+                if (board[x+dx][y+dy].isRevealed == false and board[x+dx][y+dy].isFlagged == false) {
                     count++;
                 };
             };
@@ -183,6 +184,7 @@ public:
             std::string rowString = "";
             for(int i = 0; i < rows; i++) {
                 if(board[i][j].isFlagged) {
+                    rowString.append("F");
                     rowString.append("F");
                 } else if(not board[i][j].isRevealed) {
                     rowString.append("-");

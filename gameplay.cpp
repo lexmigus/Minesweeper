@@ -1,4 +1,5 @@
 #include "solver.hpp"
+#include "solver.hpp"
 
 bool playing = true;
 bool firstMove = true;
