@@ -23,7 +23,6 @@ struct Cell {
 };
 
 class Board {
-
 public:
     Board(int r, int c, int mines) : rows(r), cols(c), totalMines(mines) {
         board.resize(rows, std::vector<Cell>(cols));
@@ -80,7 +79,7 @@ public:
             int dx = offset.first;
             int dy = offset.second;
             if(isValidLocation(x + dx, y + dy)) {
-                if (board[x+dx][y+dy].isRevealed == false) {
+                if (board[x+dx][y+dy].isRevealed == false and board[x+dx][y+dy].isFlagged == false) {
                     revealCell(x+dx, y+dy);
                 };
             };
@@ -94,8 +93,8 @@ public:
             int dx = offset.first;
             int dy = offset.second;
             if(isValidLocation(x + dx, y + dy)) {
-                if (board[x+dx][y+dy].isFlagged == false) {
-                    toggleFlag(x+dx, y+dy);
+                if (board[x+dx][y+dy].isRevealed == false) {
+                    board[x+dx][y+dy].isFlagged = true;
                 };
             };
         };
@@ -125,7 +124,7 @@ public:
             int dx = offset.first;
             int dy = offset.second;
             if(isValidLocation(x + dx, y + dy)) {
-                if (board[x+dx][y+dy].isRevealed == false) {
+                if (board[x+dx][y+dy].isRevealed == false and board[x+dx][y+dy].isFlagged == false) {
                     count++;
                 };
             };
@@ -173,7 +172,7 @@ public:
             std::string rowString = "";
             for(int i = 0; i < rows; i++) {
                 if(board[i][j].isFlagged) {
-                    rowString.append("X");
+                    rowString.append("F");
                 } else if(not board[i][j].isRevealed) {
                     rowString.append("-");
                 } else if(board[i][j].surroundingMines == 0) {

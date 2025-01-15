@@ -1,5 +1,4 @@
-#include "board.hpp"
-//#include "solver.hpp"
+#include "solver.hpp"
 
 bool playing = true;
 bool firstMove = true;
@@ -33,6 +32,8 @@ main() {
             board.printBoard();
             std::cout << "board generated"<< std::endl;
         };
+        // board.revealCell(x,y);
+        // solve(board);
         //Flip, if explodes, end game
         if (board.revealCell(x,y)){
             std::cout << "You lose!" << std::endl;
