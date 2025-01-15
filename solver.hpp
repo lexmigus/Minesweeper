@@ -11,10 +11,10 @@ void solveCell(Board& board, std::pair<int, int> cell) {
         int surroundingFlags = board.countSurroundingFlags(x, y);
         int surroundingHidden = board.countSurroundingHidden(x, y);
         if (surroundingFlags == board.checkSurroundingCellCounts(x, y)) {
-            board.revealAllNeighbors(x, y);
+            board.revealNeighbors(x, y);
         }
         else if (surroundingFlags + surroundingHidden == board.checkSurroundingCellCounts(x, y)) {
-            board.flagAllNeighbors(x, y);
+            board.flagNeighbors(x, y);
         }
     }
 }
