@@ -14,11 +14,11 @@ void solveCell(Board& board, std::pair<int, int> cell) {
 
         if (surroundingFlags == numberOfMines) {
             std::cout << "revealing" << std::endl;
-            board.revealAllNeighbors(x, y);
+            board.forAllNeighbors(x, y, [&](int nx, int ny) { board.revealNeighbors(nx, ny); });
         }
         else if (surroundingFlags + surroundingHidden == numberOfMines) {
             std::cout << "flagging" << std::endl;
-            board.flagAllNeighbors(x, y);
+            board.forAllNeighbors(x, y, [&](int nx, int ny) { board.flagNeighbors(nx, ny); });
         }
     }
 }

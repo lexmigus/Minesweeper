@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <functional>
 
 #define MINES 10
 #define BOARD_SIZE 9
@@ -72,33 +73,43 @@ public:
         };
     };
 
-    // Reveals all neighbors of a cell, for trivial solver logic
-    void revealAllNeighbors(int x, int y) {
+    void forAllNeighbors(int x, int y, std::function<void(int, int)> func) {
         const std::pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
             if(isValidLocation(x + dx, y + dy)) {
-                if (board[x+dx][y+dy].isRevealed == false and board[x+dx][y+dy].isFlagged == false) {
-                    revealCell(x+dx, y+dy);
-                };
+                func(x+dx, y+dy);
             };
         };
     };
 
-    // Flags all neighbors of a cell, for trivial solver logic
-    void flagAllNeighbors(int x, int y) {
+    int countSurrounding(int x, int y, std::function<int(int, int)> func) {
+        int count = 0;
         const std::pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
             if(isValidLocation(x + dx, y + dy)) {
-                if (board[x+dx][y+dy].isRevealed == false) {
-                    board[x+dx][y+dy].isFlagged = true;
-                };
+                count += func(x+dx, y+dy);
             };
         };
+        return count;
     };
+
+    // Reveals all neighbors of a cell, for trivial solver logic
+    void revealNeighbors(int x, int y) {
+        if (board[x][y].isRevealed == false and board[x][y].isFlagged == false) {
+            revealCell(x, y);
+        };
+    };
+
+    // Flags all neighbors of a cell, for trivial solver logic
+    void flagNeighbors(int x, int y) {
+        if (board[x][y].isRevealed == false) {
+            board[x][y].isFlagged = true;
+        };
+};
 
     // Counts the number of flags surrounding a cell, for solver logic
     int countSurroundingFlags (int x, int y) {

@@ -32,25 +32,26 @@ main() {
             board.printBoard();
             std::cout << "board generated"<< std::endl;
         };
-        // board.revealCell(x,y);
+        board.revealCell(x,y);
+        solve(board);
         // solve(board);
         //Flip, if explodes, end game
-        if (board.revealCell(x,y)){
-            std::cout << "You lose!" << std::endl;
-            firstMove = true;
-            playing = false;
-            break;
-        };
-        std::cout << "cell revealed"<< std::endl;
-        if(squaresStillHidden == MINES) {
-            std::cout << "You win!" << std::endl;
-            playing = false;
-        };
-        std::cout << "Squares still hidden: " << squaresStillHidden << std::endl;
-        board.printBoard();
-        board.printCounts();
-        std::cout << std::endl;
-        board.printMines();
+        // if (board.revealCell(x,y)){
+        //     std::cout << "You lose!" << std::endl;
+        //     firstMove = true;
+        //     playing = false;
+        //     break;
+        // };
+        // std::cout << "cell revealed"<< std::endl;
+        // if(squaresStillHidden == MINES) {
+        //     std::cout << "You win!" << std::endl;
+        //     playing = false;
+        // };
+        // std::cout << "Squares still hidden: " << squaresStillHidden << std::endl;
+        // board.printBoard();
+        // board.printCounts();
+        // std::cout << std::endl;
+        // board.printMines();
     }
 }
 
