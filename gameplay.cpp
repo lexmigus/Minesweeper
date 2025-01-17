@@ -1,5 +1,4 @@
 #include "solver.hpp"
-#include "solver.hpp"
 
 bool playing = true;
 bool firstMove = true;
@@ -23,7 +22,6 @@ main() {
         auto cell = requestCell();
         x = cell.first;
         y = cell.second;
-        std::cout << "x: " << x << " y: " << y << std::endl;
         //Place mines after first move
         if (firstMove) {
             std::cout << "dropping mines"<< std::endl;
@@ -34,7 +32,10 @@ main() {
             std::cout << "board generated"<< std::endl;
         };
         board.revealCell(x,y);
-        solve(board);
+        if (solve(board)){
+            std::cout << "You win!" << std::endl;
+            playing = false;
+        }
         // solve(board);
         //Flip, if explodes, end game
         // if (board.revealCell(x,y)){

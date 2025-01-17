@@ -4,6 +4,7 @@
 #include <ctime>
 #include <string>
 #include <functional>
+#include <set>
 
 #define MINES 10
 #define BOARD_SIZE 9
@@ -21,6 +22,7 @@ struct Cell {
     int surroundingMines = 0;
     bool isRevealed = false;
     bool isFlagged = false;
+    bool solved = false;
 };
 
 class Board {
@@ -59,9 +61,21 @@ public:
         return board[x][y].isRevealed == true;
     };
 
+    bool cellSolved(int x, int y){
+        return board[x][y].solved == true;
+    }
+
+    void setSolved(int x, int y){
+        board[x][y].solved = true;
+    }
+
     // Sets the Flag of a cell to true, for solver only
     void setFlag(int x, int y) {
         board[x][y].isFlagged = true;
+    };
+
+    bool isFlagged(int x, int y) {
+        return board[x][y].isFlagged == true;
     };
 
     // Marks a cell as flagged, or unflags it if already flagged
@@ -73,43 +87,60 @@ public:
         };
     };
 
-    void forAllNeighbors(int x, int y, std::function<void(int, int)> func) {
+    // void forAllNeighbors(int x, int y, std::function<void(int, int)> func) {
+    //     const std::pair<int, int> offsets[] = OFFSETS;
+    //     for (const auto& offset: offsets) {
+    //         int dx = offset.first;
+    //         int dy = offset.second;
+    //         if(isValidLocation(x + dx, y + dy)) {
+    //             func(x+dx, y+dy);
+    //         };
+    //     };
+    // };
+
+    // int countSurrounding(int x, int y, std::function<int(int, int)> func) {
+    //     int count = 0;
+    //     const std::pair<int, int> offsets[] = OFFSETS;
+    //     for (const auto& offset: offsets) {
+    //         int dx = offset.first;
+    //         int dy = offset.second;
+    //         if(isValidLocation(x + dx, y + dy)) {
+    //             count += func(x+dx, y+dy);
+    //         };
+    //     };
+    //     return count;
+    // };
+
+    bool hasWon() {
+        return squaresStillHidden == totalMines;
+    };
+
+    void revealAllNeighbors(int x, int y) {
         const std::pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
             if(isValidLocation(x + dx, y + dy)) {
-                func(x+dx, y+dy);
+                if (board[x + dx][y + dy].isRevealed == false and board[x + dx][y + dy].isFlagged == false) {
+                        revealCell(x+dx, y+dy);
+                };
             };
         };
     };
 
-    int countSurrounding(int x, int y, std::function<int(int, int)> func) {
-        int count = 0;
+void flagAllNeighbors(int x, int y) {
         const std::pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
             if(isValidLocation(x + dx, y + dy)) {
-                count += func(x+dx, y+dy);
+                if (board[x + dx][y + dy].isRevealed == false) {
+                    board[x + dx][y + dy].isFlagged = true;
+                };
             };
         };
-        return count;
     };
 
-    // Reveals all neighbors of a cell, for trivial solver logic
-    void revealNeighbors(int x, int y) {
-        if (board[x][y].isRevealed == false and board[x][y].isFlagged == false) {
-            revealCell(x, y);
-        };
-    };
-
-    // Flags all neighbors of a cell, for trivial solver logic
-    void flagNeighbors(int x, int y) {
-        if (board[x][y].isRevealed == false) {
-            board[x][y].isFlagged = true;
-        };
-};
 
     // Counts the number of flags surrounding a cell, for solver logic
     int countSurroundingFlags (int x, int y) {
@@ -183,7 +214,6 @@ public:
             std::string rowString = "";
             for(int i = 0; i < rows; i++) {
                 if(board[i][j].isFlagged) {
-                    rowString.append("F");
                     rowString.append("F");
                 } else if(not board[i][j].isRevealed) {
                     rowString.append("-");
@@ -261,16 +291,17 @@ public:
         return true;
     };
 
+    // Determines if cell is in the bounds of the board
+    bool isValidLocation(int x, int y) {
+        return (0 <= x and x < rows) and (0 <= y and y < cols);
+    }
+
+
 private:
     int rows;
     int cols;
     int totalMines;
     std::vector<std::vector<Cell>> board;
-
-    // Determines if cell is in the bounds of the board
-    bool isValidLocation(int x, int y) {
-        return (0 <= x and x < rows) and (0 <= y and y < cols);
-    }
 
 
     // Makes sure mines not placed in start square. Returns true if position in start square, false otherwise
