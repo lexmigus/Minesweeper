@@ -53,6 +53,16 @@ public:
     bool isHidden(int x, int y) {
         return board[x][y].isRevealed == false;
     };
+    
+    // Returns number of surrounding mines
+    bool surroundingMines(int x, int y) {
+        return board[x][y].surroundingMines;
+    };
+
+    // returns true if the cell contains a mine, false otherwise
+    bool isFlagged(int x, int y) {
+        return board[x][y].isFlagged == true;
+    };
 
     // Returns true if the cell is revealed, false otherwise
     bool isRevealed(int x, int y) {

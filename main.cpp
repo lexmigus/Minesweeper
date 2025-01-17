@@ -3,6 +3,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 #include <stdio.h>
+#include "board.hpp"
 
 void glfw_error_callback(int error, const char* description) {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
@@ -52,15 +53,33 @@ int main() {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowSize(ImVec2((float)mode->width, (float)mode->height));
         ImGui::Begin("FullScreenWindow", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-
-        // Display a sentence
-        
+                
         ImGui::Text("Enter x: ");
         ImGui::SameLine();
         ImGui::InputInt("##x_coords", &x_coords);
         ImGui::Text("Enter y: ");
         ImGui::SameLine();
         ImGui::InputInt("##y_coords", &y_coords);
+        
+        Board board(x_coords, y_coords, 10);
+
+        for(int j = 0; j < x_coords; j++) {
+            for(int i = 0; i < y_coords; i++) {
+                if(board.isFlagged(j,i)) {
+                    ImGui::Button("F");
+                } else if(!board.isRevealed(j,i)) {
+                    ImGui::Button("-");
+                } else if(board.surroundingMines(j,i) == 0) {
+                    ImGui::Button(".");
+                } else {
+                    ImGui::Button(std::to_string(board.surroundingMines(j,i)).c_str());
+                }
+                if(i < y_coords - 1) {
+                    ImGui::SameLine();
+                }
+            };
+        };
+
         ImGui::Text("x: %d y: %d", x_coords, y_coords);
         
         ImGui::End();
