@@ -176,7 +176,7 @@ public:
     int checkSurroundingCellCounts(int x, int y) {
         return board[x][y].surroundingMines;
     };
-
+    
     // Prints the board to terminal
     void printBoard() {
         for(int j = 0; j < cols; j++) {
