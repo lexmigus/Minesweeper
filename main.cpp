@@ -38,8 +38,12 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 410 core");
 
-    int x_coords = 0;
-    int y_coords = 0;
+    int x_coords = 9;
+    int y_coords = 9;
+    int number_of_mines = 10;
+    bool new_game = false;
+
+    Board board(y_coords, x_coords, number_of_mines);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -60,25 +64,48 @@ int main() {
         ImGui::Text("Enter y: ");
         ImGui::SameLine();
         ImGui::InputInt("##y_coords", &y_coords);
-        
-        Board board(x_coords, y_coords, 10);
+        ImGui::SameLine();
+        ImGui::InputInt("##number_of_mines", &number_of_mines);
 
-        for(int j = 0; j < x_coords; j++) {
-            for(int i = 0; i < y_coords; i++) {
-                if(board.isFlagged(j,i)) {
-                    ImGui::Button("F");
-                } else if(!board.isRevealed(j,i)) {
-                    ImGui::Button("-");
-                } else if(board.surroundingMines(j,i) == 0) {
-                    ImGui::Button(".");
-                } else {
-                    ImGui::Button(std::to_string(board.surroundingMines(j,i)).c_str());
+        if (ImGui::Button("New Game")) {
+            new_game = true;
+        }
+
+        if (new_game) {
+            if (x_coords > 0 && y_coords > 0) {
+                board = Board(y_coords, x_coords, number_of_mines);
+                new_game = false;
+            } else {
+                fprintf(stderr, "Invalid board dimensions: x=%d, y=%d\n", x_coords, y_coords);
+            }
+        }
+
+        // Render the board
+        if (x_coords > 0 && y_coords > 0) {
+            for (int j = 0; j < y_coords; j++) {
+                for (int i = 0; i < x_coords; i++) {
+                    std::string button_id = "##button_" + std::to_string(i) + "_" + std::to_string(j);
+                    if (board.isFlagged(j, i)) {
+                        if (ImGui::Button(("F" + button_id).c_str())) {
+                            board.toggleFlag(j, i);
+                        }
+                    } else if (!board.isRevealed(j, i)) {
+                        if (ImGui::Button(("-" + button_id).c_str())) {
+                            board.revealCell(j, i);
+                        }
+                    } else if (board.surroundingMines(j, i) == 0) {
+                        if (ImGui::Button(("." + button_id).c_str())) {
+                            board.revealCell(j, i);
+                        }
+                    } else {
+                        ImGui::Button((std::to_string(board.surroundingMines(j, i)) + button_id).c_str());
+                    }
+                    if (i < y_coords - 1) {
+                        ImGui::SameLine();
+                    }
                 }
-                if(i < y_coords - 1) {
-                    ImGui::SameLine();
-                }
-            };
-        };
+            }
+        }
 
         ImGui::Text("x: %d y: %d", x_coords, y_coords);
         
