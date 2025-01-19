@@ -74,6 +74,7 @@ int main() {
         if (new_game) {
             if (x_coords > 0 && y_coords > 0) {
                 board = Board(y_coords, x_coords, number_of_mines);
+                board.placeMines(number_of_mines, 0, 0);
                 new_game = false;
             } else {
                 fprintf(stderr, "Invalid board dimensions: x=%d, y=%d\n", x_coords, y_coords);
@@ -91,7 +92,9 @@ int main() {
                         }
                     } else if (!board.isRevealed(j, i)) {
                         if (ImGui::Button(("-" + button_id).c_str())) {
-                            board.revealCell(j, i);
+                            if(board.revealCell(j, i)) {
+                                fprintf(stderr, "Game over\n");
+                            }
                         }
                     } else if (board.surroundingMines(j, i) == 0) {
                         if (ImGui::Button(("." + button_id).c_str())) {
