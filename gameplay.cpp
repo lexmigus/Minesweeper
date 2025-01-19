@@ -35,6 +35,11 @@ main() {
             cout << "mines placed"<< endl;
             firstMove = false;
             board.printBoard();
+            cout << endl;
+            board.printCounts();
+            cout << endl;
+            board.printMines();
+            cout << endl;
             cout << "board generated"<< endl;
         };
         board.revealCell(x,y);
@@ -42,7 +47,6 @@ main() {
             cout << "You win!" << endl;
             playing = false;
         }
-        // solve(board);
         //Flip, if explodes, end game
         // if (board.revealCell(x,y)){
         //     cout << "You lose!" << endl;

@@ -44,10 +44,10 @@ public:
     void placeMines(int mines, int x, int y) {
         int mineCount = 0;
         srand(time(0));
-
+        cout << numCols() << "," << numRows() << endl;
         while (mineCount < mines){
-            int randomX = rand()%cols;
-            int randomY = rand()%rows;
+            int randomX = rand()%numRows();
+            int randomY = rand()%numCols();
 
             if(not placesMineInStartSquare(x, y, randomX, randomY)) {
                 if (!board[randomX][randomY].containsMine) {
@@ -64,9 +64,9 @@ public:
     bool isHidden(int x, int y) {
         return board[x][y].isRevealed == false;
     };
-    
+
     // Returns number of surrounding mines
-    bool surroundingMines(int x, int y) {
+    int surroundingMines(int x, int y) {
         return board[x][y].surroundingMines;
     };
 
@@ -253,36 +253,36 @@ void flagAllNeighbors(int x, int y) {
 
     // Testing
     // Prints position of all mines to terminal
-    // void printMines() {
-    //     for(int j = 0; j < cols; j++) {
-    //         string rowString = "";
-    //         for(int i = 0; i < rows; i++) {
-    //             if(board[i][j].containsMine) {
-    //                 rowString.append("X");
-    //             } else {
-    //                 rowString.append("-");
-    //             };
-    //         };
-    //         cout << rowString << endl;
-    //     };
-    // };
+    void printMines() {
+        for(int j = 0; j < cols; j++) {
+            string rowString = "";
+            for(int i = 0; i < rows; i++) {
+                if(board[i][j].containsMine) {
+                    rowString.append("X");
+                } else {
+                    rowString.append("-");
+                };
+            };
+            cout << rowString << endl;
+        };
+    };
 
-    // // Prints the number mines surround each cell to the terminal
-    // void printCounts() {
-    //     for(int j = 0; j < cols; j++) {
-    //         string rowString = "";
-    //         for(int i = 0; i < rows; i++) {
-    //             if(board[i][j].containsMine) {
-    //                 rowString.append("X");
-    //             } else if(board[i][j].surroundingMines == 0) {
-    //                 rowString.append("-");
-    //             } else {
-    //                 rowString.append(to_string(board[i][j].surroundingMines));
-    //             };
-    //         };
-    //         cout << rowString << endl;
-    //     };
-    // };
+    // Prints the number mines surround each cell to the terminal
+    void printCounts() {
+        for(int j = 0; j < cols; j++) {
+            string rowString = "";
+            for(int i = 0; i < rows; i++) {
+                if(board[i][j].containsMine) {
+                    rowString.append("X");
+                } else if(board[i][j].surroundingMines == 0) {
+                    rowString.append("-");
+                } else {
+                    rowString.append(to_string(board[i][j].surroundingMines));
+                };
+            };
+            cout << rowString << endl;
+        };
+    };
 
     // Returns true if all neighbours of a cell are known, no further solving possible
     bool allNeighboursKnown (int x, int y) {
