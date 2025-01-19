@@ -2,7 +2,6 @@
 
 bool playing = true;
 bool firstMove = true;
-using namespace std;
 // Request user input for x and y position to reveal
 pair<int, int> requestCell() {
     int x, y;

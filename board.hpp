@@ -5,6 +5,7 @@
 #include <string>
 #include <functional>
 #include <set>
+using namespace std;
 
 #define OFFSETS { \
     {-1, -1}, {-1, 0}, {-1, 1}, \
@@ -103,6 +104,10 @@ public:
         } else {
             board[x][y].isFlagged = false;
         };
+    };
+
+    bool isBomb(int x, int y) {
+        return board[x][y].containsMine == true;
     };
 
     // void forAllNeighbors(int x, int y, function<void(int, int)> func) {
@@ -225,7 +230,7 @@ void flagAllNeighbors(int x, int y) {
     int checkSurroundingCellCounts(int x, int y) {
         return board[x][y].surroundingMines;
     };
-    
+
     // Prints the board to terminal
     void printBoard() {
         for(int j = 0; j < cols; j++) {
@@ -248,36 +253,36 @@ void flagAllNeighbors(int x, int y) {
 
     // Testing
     // Prints position of all mines to terminal
-    void printMines() {
-        for(int j = 0; j < cols; j++) {
-            string rowString = "";
-            for(int i = 0; i < rows; i++) {
-                if(board[i][j].containsMine) {
-                    rowString.append("X");
-                } else {
-                    rowString.append("-");
-                };
-            };
-            cout << rowString << endl;
-        };
-    };
+    // void printMines() {
+    //     for(int j = 0; j < cols; j++) {
+    //         string rowString = "";
+    //         for(int i = 0; i < rows; i++) {
+    //             if(board[i][j].containsMine) {
+    //                 rowString.append("X");
+    //             } else {
+    //                 rowString.append("-");
+    //             };
+    //         };
+    //         cout << rowString << endl;
+    //     };
+    // };
 
-    // Prints the number mines surround each cell to the terminal
-    void printCounts() {
-        for(int j = 0; j < cols; j++) {
-            string rowString = "";
-            for(int i = 0; i < rows; i++) {
-                if(board[i][j].containsMine) {
-                    rowString.append("X");
-                } else if(board[i][j].surroundingMines == 0) {
-                    rowString.append("-");
-                } else {
-                    rowString.append(to_string(board[i][j].surroundingMines));
-                };
-            };
-            cout << rowString << endl;
-        };
-    };
+    // // Prints the number mines surround each cell to the terminal
+    // void printCounts() {
+    //     for(int j = 0; j < cols; j++) {
+    //         string rowString = "";
+    //         for(int i = 0; i < rows; i++) {
+    //             if(board[i][j].containsMine) {
+    //                 rowString.append("X");
+    //             } else if(board[i][j].surroundingMines == 0) {
+    //                 rowString.append("-");
+    //             } else {
+    //                 rowString.append(to_string(board[i][j].surroundingMines));
+    //             };
+    //         };
+    //         cout << rowString << endl;
+    //     };
+    // };
 
     // Returns true if all neighbours of a cell are known, no further solving possible
     bool allNeighboursKnown (int x, int y) {

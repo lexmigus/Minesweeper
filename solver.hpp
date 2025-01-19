@@ -144,7 +144,7 @@ bool solve(Board& board) {
         cout << "Iteration: " << i+1 << endl;
         for (int i = 0; i < board.numCols(); i++) {
             for (int j = 0; j < board.numRows(); j++) {
-                recursiveSolve(board, {i, j});
+                recursiveSolve(board, make_pair(i, j));
             }
         }
         board.printBoard();
