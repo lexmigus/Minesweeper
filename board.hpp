@@ -84,10 +84,6 @@ public:
         board[x][y].isFlagged = true;
     };
 
-    bool isFlagged(int x, int y) {
-        return board[x][y].isFlagged == true;
-    };
-
     // Marks a cell as flagged, or unflags it if already flagged
     void toggleFlag(int x, int y) {
         if (board[x][y].isFlagged == false) {
