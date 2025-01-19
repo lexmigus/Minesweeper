@@ -37,11 +37,12 @@ int main() {
     // Initialize ImGui backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 410 core");
-
+    
     int x_coords = 9;
     int y_coords = 9;
     int number_of_mines = 10;
     bool new_game = false;
+    bool toggle_flag = false;
 
     Board board(y_coords, x_coords, number_of_mines);
 
@@ -70,7 +71,7 @@ int main() {
         if (ImGui::Button("New Game")) {
             new_game = true;
         }
-
+        
         if (new_game) {
             if (x_coords > 0 && y_coords > 0) {
                 board = Board(y_coords, x_coords, number_of_mines);
@@ -80,7 +81,7 @@ int main() {
                 fprintf(stderr, "Invalid board dimensions: x=%d, y=%d\n", x_coords, y_coords);
             }
         }
-
+        
         // Render the board
         if (x_coords > 0 && y_coords > 0) {
             for (int j = 0; j < y_coords; j++) {
@@ -91,9 +92,15 @@ int main() {
                             board.toggleFlag(j, i);
                         }
                     } else if (!board.isRevealed(j, i)) {
-                        if (ImGui::Button(("-" + button_id).c_str())) {
-                            if(board.revealCell(j, i)) {
-                                fprintf(stderr, "Game over\n");
+                        if(toggle_flag) {
+                            if (ImGui::Button(("-" + button_id).c_str())) {
+                                board.toggleFlag(j, i);
+                            }
+                        } else {
+                            if (ImGui::Button(("-" + button_id).c_str())) {
+                                if(board.revealCell(j, i)) {
+                                    fprintf(stderr, "Game over\n");
+                                }
                             }
                         }
                     } else if (board.surroundingMines(j, i) == 0) {
@@ -109,6 +116,8 @@ int main() {
                 }
             }
         }
+        
+        ImGui::Checkbox("Toggle Flag", &toggle_flag);
 
         ImGui::Text("x: %d y: %d", x_coords, y_coords);
         
