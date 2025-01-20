@@ -118,7 +118,7 @@ int main() {
         }
         
         ImGui::Checkbox("Toggle Flag", &toggle_flag);
-
+        
         ImGui::Text("x: %d y: %d", x_coords, y_coords);
         
         ImGui::End();
