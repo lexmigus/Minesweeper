@@ -5,16 +5,16 @@
 #include <string>
 #include <functional>
 #include <set>
+using namespace std;
 
-#define MINES 10
-#define BOARD_SIZE 9
 #define OFFSETS { \
     {-1, -1}, {-1, 0}, {-1, 1}, \
     { 0, -1},          { 0, 1}, \
     { 1, -1}, { 1, 0}, { 1, 1}  \
 }
 
-int squaresStillHidden = BOARD_SIZE * BOARD_SIZE;
+int squaresStillHidden = 0;
+
 
 // Cell structure to represent each cell in the board
 struct Cell {
@@ -28,17 +28,26 @@ struct Cell {
 class Board {
 public:
     Board(int r, int c, int mines) : rows(r), cols(c), totalMines(mines) {
-        board.resize(rows, std::vector<Cell>(cols));
+        board.resize(rows, vector<Cell>(cols));
+        squaresStillHidden = rows * cols;
+    }
+
+    int numRows() {
+        return rows;
+    }
+
+    int numCols() {
+        return cols;
     }
 
     // Places mines on the board
     void placeMines(int mines, int x, int y) {
         int mineCount = 0;
         srand(time(0));
-
+        cout << numCols() << "," << numRows() << endl;
         while (mineCount < mines){
-            int randomX = rand()%cols;
-            int randomY = rand()%rows;
+            int randomX = rand()%numRows();
+            int randomY = rand()%numCols();
 
             if(not placesMineInStartSquare(x, y, randomX, randomY)) {
                 if (!board[randomX][randomY].containsMine) {
@@ -55,9 +64,9 @@ public:
     bool isHidden(int x, int y) {
         return board[x][y].isRevealed == false;
     };
-    
+
     // Returns number of surrounding mines
-    bool surroundingMines(int x, int y) {
+    int surroundingMines(int x, int y) {
         return board[x][y].surroundingMines;
     };
 
@@ -84,6 +93,10 @@ public:
         board[x][y].isFlagged = true;
     };
 
+    bool cellFlagged(int x, int y) {
+        return board[x][y].isFlagged == true;
+    };
+
     // Marks a cell as flagged, or unflags it if already flagged
     void toggleFlag(int x, int y) {
         if (board[x][y].isFlagged == false) {
@@ -93,8 +106,12 @@ public:
         };
     };
 
-    // void forAllNeighbors(int x, int y, std::function<void(int, int)> func) {
-    //     const std::pair<int, int> offsets[] = OFFSETS;
+    bool isBomb(int x, int y) {
+        return board[x][y].containsMine == true;
+    };
+
+    // void forAllNeighbors(int x, int y, function<void(int, int)> func) {
+    //     const pair<int, int> offsets[] = OFFSETS;
     //     for (const auto& offset: offsets) {
     //         int dx = offset.first;
     //         int dy = offset.second;
@@ -104,9 +121,9 @@ public:
     //     };
     // };
 
-    // int countSurrounding(int x, int y, std::function<int(int, int)> func) {
+    // int countSurrounding(int x, int y, function<int(int, int)> func) {
     //     int count = 0;
-    //     const std::pair<int, int> offsets[] = OFFSETS;
+    //     const pair<int, int> offsets[] = OFFSETS;
     //     for (const auto& offset: offsets) {
     //         int dx = offset.first;
     //         int dy = offset.second;
@@ -122,7 +139,7 @@ public:
     };
 
     void revealAllNeighbors(int x, int y) {
-        const std::pair<int, int> offsets[] = OFFSETS;
+        const pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
@@ -135,7 +152,7 @@ public:
     };
 
 void flagAllNeighbors(int x, int y) {
-        const std::pair<int, int> offsets[] = OFFSETS;
+        const pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
@@ -151,7 +168,7 @@ void flagAllNeighbors(int x, int y) {
     // Counts the number of flags surrounding a cell, for solver logic
     int countSurroundingFlags (int x, int y) {
         int count = 0;
-        const std::pair<int, int> offsets[] = OFFSETS;
+        const pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
@@ -167,7 +184,7 @@ void flagAllNeighbors(int x, int y) {
     // Counts the number of hidden cells surrounding a cell, for solver logic
     int countSurroundingHidden (int x, int y) {
         int count = 0;
-        const std::pair<int, int> offsets[] = OFFSETS;
+        const pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
@@ -188,12 +205,12 @@ void flagAllNeighbors(int x, int y) {
 
         // If the cell contains a mine, return true (game over)
         if (board[x][y].containsMine) {
-            std::cout << "Mine hit" << std::endl;
+            cout << "Mine hit" << endl;
             return true;
         }
         // If the cell has no surrounding mines, reveal neighbors
         if (board[x][y].surroundingMines == 0) {
-            const std::pair<int, int> offsets[] = OFFSETS;
+            const pair<int, int> offsets[] = OFFSETS;
 
             for (const auto& offset : offsets) {
                 int neighborX = x + offset.first;
@@ -213,11 +230,11 @@ void flagAllNeighbors(int x, int y) {
     int checkSurroundingCellCounts(int x, int y) {
         return board[x][y].surroundingMines;
     };
-    
+
     // Prints the board to terminal
     void printBoard() {
         for(int j = 0; j < cols; j++) {
-            std::string rowString = "";
+            string rowString = "";
             for(int i = 0; i < rows; i++) {
                 if(board[i][j].isFlagged) {
                     rowString.append("F");
@@ -226,19 +243,19 @@ void flagAllNeighbors(int x, int y) {
                 } else if(board[i][j].surroundingMines == 0) {
                     rowString.append(".");
                 } else {
-                    rowString.append(std::to_string(board[i][j].surroundingMines));
+                    rowString.append(to_string(board[i][j].surroundingMines));
                 };
             };
-            std::cout << rowString << std::endl;
+            cout << rowString << endl;
         };
-        std::cout << std::endl;
+        cout << endl;
     };
 
     // Testing
     // Prints position of all mines to terminal
     void printMines() {
         for(int j = 0; j < cols; j++) {
-            std::string rowString = "";
+            string rowString = "";
             for(int i = 0; i < rows; i++) {
                 if(board[i][j].containsMine) {
                     rowString.append("X");
@@ -246,30 +263,30 @@ void flagAllNeighbors(int x, int y) {
                     rowString.append("-");
                 };
             };
-            std::cout << rowString << std::endl;
+            cout << rowString << endl;
         };
     };
 
     // Prints the number mines surround each cell to the terminal
     void printCounts() {
         for(int j = 0; j < cols; j++) {
-            std::string rowString = "";
+            string rowString = "";
             for(int i = 0; i < rows; i++) {
                 if(board[i][j].containsMine) {
                     rowString.append("X");
                 } else if(board[i][j].surroundingMines == 0) {
                     rowString.append("-");
                 } else {
-                    rowString.append(std::to_string(board[i][j].surroundingMines));
+                    rowString.append(to_string(board[i][j].surroundingMines));
                 };
             };
-            std::cout << rowString << std::endl;
+            cout << rowString << endl;
         };
     };
 
     // Returns true if all neighbours of a cell are known, no further solving possible
     bool allNeighboursKnown (int x, int y) {
-        const std::pair<int, int> offsets[] = OFFSETS;
+        const pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
@@ -284,7 +301,7 @@ void flagAllNeighbors(int x, int y) {
 
     // Returns true if all neighbours of a cell are unknown, no further solving possible
     bool allNeighboursUnknown (int x, int y) {
-        const std::pair<int, int> offsets[] = OFFSETS;
+        const pair<int, int> offsets[] = OFFSETS;
         for (const auto& offset: offsets) {
             int dx = offset.first;
             int dy = offset.second;
@@ -307,7 +324,7 @@ private:
     int rows;
     int cols;
     int totalMines;
-    std::vector<std::vector<Cell>> board;
+    vector<vector<Cell>> board;
 
 
     // Makes sure mines not placed in start square. Returns true if position in start square, false otherwise
@@ -318,7 +335,7 @@ private:
 
     // Increments the surrounding mine count for a cell
     void incrementSurroundingMineCount(int x, int y) {
-        const std::pair<int, int> offsets[] = OFFSETS;
+        const pair<int, int> offsets[] = OFFSETS;
 
         for (const auto& offset: offsets) {
             int dx = offset.first;
