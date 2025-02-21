@@ -117,11 +117,14 @@ int main() {
                             }
                         }
                     } else if (board.surroundingMines(i, j) == 0 && !board.isBomb(i, j)) {
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));  // Red text 
                         if (ImGui::Button(("." + button_id).c_str())) {
                             board.revealCell(i, j);
                         }
+                        ImGui::PopStyleColor();
                     } else if(board.isBomb(i,j)) {
-                            ImGui::Button(("X" + button_id).c_str());
+                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));  // Red text 
+                            ImGui::Button((" " + button_id).c_str());
                     } else {
                         ImGui::Button((std::to_string(board.surroundingMines(i, j)) + button_id).c_str());
                     }
