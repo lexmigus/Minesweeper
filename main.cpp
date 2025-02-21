@@ -18,7 +18,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Required for macOS
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     
     GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(primaryMonitor);
@@ -74,7 +74,6 @@ int main() {
 
         if (ImGui::Button("New Game")) {
             new_game = true;
-            fprintf(stderr, "New Game\n");
         }
         
         if (new_game) {
@@ -114,14 +113,15 @@ int main() {
                                             board.revealCell(k,l);
                                         }
                                     }
-                                    fprintf(stderr, "Game over\n");
                                 }
                             }
                         }
-                    } else if (board.surroundingMines(i, j) == 0) {
+                    } else if (board.surroundingMines(i, j) == 0 && !board.isBomb(i, j)) {
                         if (ImGui::Button(("." + button_id).c_str())) {
                             board.revealCell(i, j);
                         }
+                    } else if(board.isBomb(i,j)) {
+                            ImGui::Button(("X" + button_id).c_str());
                     } else {
                         ImGui::Button((std::to_string(board.surroundingMines(i, j)) + button_id).c_str());
                     }
@@ -143,7 +143,7 @@ int main() {
         } else {
             ImGui::Text("Game in progress");
         }
-        
+
         ImGui::End();
 
         // Render

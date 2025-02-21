@@ -325,7 +325,6 @@ private:
     int totalMines;
     vector<vector<Cell>> board;
 
-
     // Makes sure mines not placed in start square. Returns true if position in start square, false otherwise
     bool placesMineInStartSquare(int x, int y, int x_placed, int y_placed) {
         return (x - 1 <= x_placed and x_placed <= x + 1) and
