@@ -40,11 +40,15 @@ int main() {
     
     int x_coords = 9;
     int y_coords = 9;
+    int place_holder_x_coords = 9;
+    int place_holder_y_coords = 9;
     int number_of_mines = 10;
+    int number_of_mines_placeholder = 10;
+    bool is_lost = false;
     bool new_game = false;
     bool toggle_flag = false;
 
-    Board board(y_coords, x_coords, number_of_mines);
+    Board board(x_coords, y_coords, number_of_mines);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -61,24 +65,29 @@ int main() {
                 
         ImGui::Text("Enter x: ");
         ImGui::SameLine();
-        ImGui::InputInt("##x_coords", &x_coords);
+        ImGui::InputInt("##x_coords", &place_holder_x_coords);
         ImGui::Text("Enter y: ");
         ImGui::SameLine();
-        ImGui::InputInt("##y_coords", &y_coords);
+        ImGui::InputInt("##y_coords", &place_holder_y_coords);
         ImGui::SameLine();
         ImGui::InputInt("##number_of_mines", &number_of_mines);
 
         if (ImGui::Button("New Game")) {
             new_game = true;
+            fprintf(stderr, "New Game\n");
         }
         
         if (new_game) {
-            if (x_coords > 0 && y_coords > 0) {
-                board = Board(y_coords, x_coords, number_of_mines);
+            if (place_holder_x_coords > 0 && place_holder_y_coords > 0) {
+                x_coords = place_holder_x_coords;
+                y_coords = place_holder_y_coords;
+                number_of_mines = number_of_mines_placeholder;
+                board = Board(place_holder_x_coords, place_holder_y_coords, number_of_mines);
                 board.placeMines(number_of_mines, 0, 0);
                 new_game = false;
+                is_lost = false;
             } else {
-                fprintf(stderr, "Invalid board dimensions: x=%d, y=%d\n", x_coords, y_coords);
+                fprintf(stderr, "Invalid board size\n");
             }
         }
         
@@ -87,30 +96,36 @@ int main() {
             for (int j = 0; j < y_coords; j++) {
                 for (int i = 0; i < x_coords; i++) {
                     std::string button_id = "##button_" + std::to_string(i) + "_" + std::to_string(j);
-                    if (board.isFlagged(j, i)) {
+                    if (board.isFlagged(i, j)) {
                         if (ImGui::Button(("F" + button_id).c_str())) {
-                            board.toggleFlag(j, i);
+                            board.toggleFlag(i, j);
                         }
-                    } else if (!board.isRevealed(j, i)) {
+                    } else if (!board.isRevealed(i, j)) {
                         if(toggle_flag) {
                             if (ImGui::Button(("-" + button_id).c_str())) {
-                                board.toggleFlag(j, i);
+                                board.toggleFlag(i, j);
                             }
                         } else {
                             if (ImGui::Button(("-" + button_id).c_str())) {
-                                if(board.revealCell(j, i)) {
+                                if(board.revealCell(i, j)) {
+                                    is_lost = true;
+                                    for (int l = 0; l < y_coords; l++) {
+                                        for (int k = 0; k < x_coords; k++) {
+                                            board.revealCell(k,l);
+                                        }
+                                    }
                                     fprintf(stderr, "Game over\n");
                                 }
                             }
                         }
-                    } else if (board.surroundingMines(j, i) == 0) {
+                    } else if (board.surroundingMines(i, j) == 0) {
                         if (ImGui::Button(("." + button_id).c_str())) {
-                            board.revealCell(j, i);
+                            board.revealCell(i, j);
                         }
                     } else {
-                        ImGui::Button((std::to_string(board.surroundingMines(j, i)) + button_id).c_str());
+                        ImGui::Button((std::to_string(board.surroundingMines(i, j)) + button_id).c_str());
                     }
-                    if (i < y_coords - 1) {
+                    if (i < x_coords - 1) {
                         ImGui::SameLine();
                     }
                 }
@@ -118,8 +133,16 @@ int main() {
         }
         
         ImGui::Checkbox("Toggle Flag", &toggle_flag);
-
+        
         ImGui::Text("x: %d y: %d", x_coords, y_coords);
+        
+        if(is_lost) {
+            ImGui::Text("Game Over");
+        } else if(board.hasWon()) {
+            ImGui::Text("You Win!");
+        } else {
+            ImGui::Text("Game in progress");
+        }
         
         ImGui::End();
 

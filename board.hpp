@@ -44,7 +44,6 @@ public:
     void placeMines(int mines, int x, int y) {
         int mineCount = 0;
         srand(time(0));
-        cout << numCols() << "," << numRows() << endl;
         while (mineCount < mines){
             int randomX = rand()%numRows();
             int randomY = rand()%numCols();
@@ -92,7 +91,7 @@ public:
     void setFlag(int x, int y) {
         board[x][y].isFlagged = true;
     };
-
+    
     bool cellFlagged(int x, int y) {
         return board[x][y].isFlagged == true;
     };
