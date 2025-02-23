@@ -12,7 +12,7 @@ pair<int, int> requestCell() {
     return {x - 1, y - 1};
 }
 
-main() {
+int main() {
     int width, height, mines;
     cout << "Enter width: ";
     cin >> width;
@@ -65,6 +65,7 @@ main() {
         // cout << endl;
         // board.printMines();
     }
+    return 0;
 }
 
 
