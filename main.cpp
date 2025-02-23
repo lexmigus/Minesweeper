@@ -38,6 +38,7 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 410 core");
     
+    // Initial values and placeholders for board
     int x_coords = 9;
     int y_coords = 9;
     int place_holder_x_coords = 9;
@@ -63,27 +64,63 @@ int main() {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         ImGui::SetNextWindowSize(ImVec2((float)mode->width, (float)mode->height));
         ImGui::Begin("FullScreenWindow", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
-                
+        
+        // User input
         ImGui::Text("Enter x: ");
         ImGui::SameLine();
+        ImGui::SetNextItemWidth(100);
         ImGui::InputInt("##x_coords", &place_holder_x_coords);
         ImGui::NewLine();
         ImGui::Text("Enter y: ");
         ImGui::SameLine();
+        ImGui::SetNextItemWidth(100);
         ImGui::InputInt("##y_coords", &place_holder_y_coords);
         ImGui::NewLine();
-        ImGui::Text("Number of mines: ");
+        ImGui::Text("Mines:   ");
         ImGui::SameLine();
-        ImGui::InputInt("##number_of_mines", &number_of_mines);
+        ImGui::SetNextItemWidth(100);
+        ImGui::InputInt("##number_of_mines", &number_of_mines_placeholder);
         
+        // New game button
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.7f, 0.0f, 1.0f));  // Green colour
         if (ImGui::Button("New Game")) {
             new_game = true;
         }
         ImGui::PopStyleColor();
         
+        // Popups for win and lose
+        if(is_lost) {
+            ImGui::OpenPopup("GameOver");
+        } else if(board.hasWon()) {
+            ImGui::OpenPopup("Win");
+        }
+        
+        if (ImGui::BeginPopup("GameOver")) {
+            ImGui::Text("You lost!");
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.7f, 0.0f, 1.0f));
+            if (ImGui::Button("New Game")) {
+                is_lost = false;
+                new_game = true;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::PopStyleColor();
+            ImGui::EndPopup();
+        }
+
+        if (ImGui::BeginPopup("Win")) {
+            ImGui::Text("You won!");
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.7f, 0.0f, 1.0f));
+            if (ImGui::Button("New Game")) {
+                new_game = true;
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::PopStyleColor();
+            ImGui::EndPopup();
+        }
+        
+        // Initializes board and resets values for new game
         if (new_game) {
-            if (place_holder_x_coords > 0 && place_holder_y_coords > 0) {
+            if (place_holder_x_coords > 0 && place_holder_y_coords > 0 && number_of_mines_placeholder < (place_holder_x_coords * place_holder_y_coords)) {
                 x_coords = place_holder_x_coords;
                 y_coords = place_holder_y_coords;
                 number_of_mines = number_of_mines_placeholder;
@@ -92,7 +129,7 @@ int main() {
                 new_game = false;
                 is_lost = false;
             } else {
-                fprintf(stderr, "Invalid board size\n");
+                ImGui::Text("Invalid board size or number of mines");
             }
         }
         
@@ -109,11 +146,11 @@ int main() {
                         ImGui::PopStyleColor();
                     } else if (!board.isRevealed(i, j)) {
                         if(toggle_flag) {
-                            if (ImGui::Button(("-" + button_id).c_str())) {
+                            if (ImGui::Button((" " + button_id).c_str())) {
                                 board.toggleFlag(i, j);
                             }
                         } else {
-                            if (ImGui::Button(("-" + button_id).c_str())) {
+                            if (ImGui::Button((" " + button_id).c_str())) {
                                 if(first_move) {
                                     board.placeMines(number_of_mines, i, j);
                                     first_move = false;
@@ -147,17 +184,9 @@ int main() {
                 }
             }
         }
-        
+        // Checkbox to toggle flag
         ImGui::Checkbox("Toggle Flag", &toggle_flag);
         
-        if(is_lost) {
-            ImGui::Text("Game Over");
-        } else if(board.hasWon()) {
-            ImGui::Text("You Win!");
-        } else {
-            ImGui::Text("Game in progress");
-        }
-
         ImGui::End();
 
         // Render
