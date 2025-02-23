@@ -1,4 +1,4 @@
-#include "board.hpp"
+#include "board.cpp"
 #include <algorithm>
 
 vector<pair<int,int>> visited;
