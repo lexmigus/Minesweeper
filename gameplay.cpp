@@ -68,4 +68,6 @@ int main() {
     return 0;
 }
 
-
+// To compile and run
+//   g++ -std=c++11 gameplay.cpp -o test.exe
+//   ./test.exe
