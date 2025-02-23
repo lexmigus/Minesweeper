@@ -167,7 +167,7 @@ int main() {
                         }
                     } else if (board.surroundingMines(i, j) == 0 && !board.isBomb(i, j)) {
                         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));  // Red colour 
-                        if (ImGui::Button(("." + button_id).c_str())) {
+                        if (ImGui::Button((" " + button_id).c_str())) {
                             board.revealCell(i, j);
                         }
                         ImGui::PopStyleColor();
