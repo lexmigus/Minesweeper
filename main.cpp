@@ -66,15 +66,20 @@ int main() {
         ImGui::Text("Enter x: ");
         ImGui::SameLine();
         ImGui::InputInt("##x_coords", &place_holder_x_coords);
+        ImGui::NewLine();
         ImGui::Text("Enter y: ");
         ImGui::SameLine();
         ImGui::InputInt("##y_coords", &place_holder_y_coords);
+        ImGui::NewLine();
+        ImGui::Text("Number of mines: ");
         ImGui::SameLine();
         ImGui::InputInt("##number_of_mines", &number_of_mines);
-
+        
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.7f, 0.0f, 1.0f));  // Green colour
         if (ImGui::Button("New Game")) {
             new_game = true;
         }
+        ImGui::PopStyleColor();
         
         if (new_game) {
             if (place_holder_x_coords > 0 && place_holder_y_coords > 0) {
@@ -97,7 +102,7 @@ int main() {
                     std::string button_id = "##button_" + std::to_string(i) + "_" + std::to_string(j);
                     if (board.isFlagged(i, j)) {
                         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.2f, 0.6f, 1.0f));
-                        if (ImGui::Button(("" + button_id).c_str())) {
+                        if (ImGui::Button((" " + button_id).c_str())) {
                             board.toggleFlag(i, j);
                         }
                         ImGui::PopStyleColor();
@@ -119,13 +124,13 @@ int main() {
                             }
                         }
                     } else if (board.surroundingMines(i, j) == 0 && !board.isBomb(i, j)) {
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));  // Red text 
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));  // Red colour 
                         if (ImGui::Button(("." + button_id).c_str())) {
                             board.revealCell(i, j);
                         }
                         ImGui::PopStyleColor();
                     } else if(board.isBomb(i,j)) {
-                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));  // Red text 
+                            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));  // Red colour
                             ImGui::Button((" " + button_id).c_str());
                             ImGui::PopStyleColor();
                     } else {
@@ -139,8 +144,6 @@ int main() {
         }
         
         ImGui::Checkbox("Toggle Flag", &toggle_flag);
-        
-        ImGui::Text("x: %d y: %d", x_coords, y_coords);
         
         if(is_lost) {
             ImGui::Text("Game Over");
