@@ -33,7 +33,7 @@ int main() {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
-
+    
     // Initialize ImGui backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 410 core");
@@ -96,9 +96,11 @@ int main() {
                 for (int i = 0; i < x_coords; i++) {
                     std::string button_id = "##button_" + std::to_string(i) + "_" + std::to_string(j);
                     if (board.isFlagged(i, j)) {
-                        if (ImGui::Button(("F" + button_id).c_str())) {
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.2f, 0.6f, 1.0f));
+                        if (ImGui::Button(("" + button_id).c_str())) {
                             board.toggleFlag(i, j);
                         }
+                        ImGui::PopStyleColor();
                     } else if (!board.isRevealed(i, j)) {
                         if(toggle_flag) {
                             if (ImGui::Button(("-" + button_id).c_str())) {
@@ -125,6 +127,7 @@ int main() {
                     } else if(board.isBomb(i,j)) {
                             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));  // Red text 
                             ImGui::Button((" " + button_id).c_str());
+                            ImGui::PopStyleColor();
                     } else {
                         ImGui::Button((std::to_string(board.surroundingMines(i, j)) + button_id).c_str());
                     }
