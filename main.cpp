@@ -47,6 +47,7 @@ int main() {
     bool is_lost = false;
     bool new_game = false;
     bool toggle_flag = false;
+    bool first_move = true;
 
     Board board(x_coords, y_coords, number_of_mines);
 
@@ -87,7 +88,7 @@ int main() {
                 y_coords = place_holder_y_coords;
                 number_of_mines = number_of_mines_placeholder;
                 board = Board(place_holder_x_coords, place_holder_y_coords, number_of_mines);
-                board.placeMines(number_of_mines, 0, 0);
+                first_move = true;
                 new_game = false;
                 is_lost = false;
             } else {
@@ -113,6 +114,10 @@ int main() {
                             }
                         } else {
                             if (ImGui::Button(("-" + button_id).c_str())) {
+                                if(first_move) {
+                                    board.placeMines(number_of_mines, i, j);
+                                    first_move = false;
+                                }
                                 if(board.revealCell(i, j)) {
                                     is_lost = true;
                                     for (int l = 0; l < y_coords; l++) {
