@@ -12,6 +12,7 @@ pair<int, int> requestCell() {
     return {x - 1, y - 1};
 }
 
+
 int main() {
     int width, height, mines;
     cout << "Enter width: ";

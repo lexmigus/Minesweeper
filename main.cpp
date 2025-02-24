@@ -3,10 +3,36 @@
 #include "backends/imgui_impl_opengl3.h"
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include "board.hpp"
+#include "solver.hpp"
 
 void glfw_error_callback(int error, const char* description) {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
+
+// Stole from gameplay.cpp, hardcoded x = 1, y = 1
+pair<int, int> requestCell() {
+    return {1, 1};
+}
+
+bool playing = true;
+// Solver for the game
+Board solveGUI(Board boardToSolve) {
+    int width = boardToSolve.numCols();
+    int height = boardToSolve.numRows();
+    int num_mines = boardToSolve.numMines();
+    while(playing) {
+        int x, y;
+        auto cell = requestCell();
+        x = cell.first;
+        y = cell.second;
+        boardToSolve.revealCell(x,y);
+        if (solve(boardToSolve)){
+            return boardToSolve;
+            cout << "You win!" << endl;
+            playing = false;
+        }
+    }
+    return boardToSolve;
 }
 
 int main() {
@@ -87,6 +113,16 @@ int main() {
             new_game = true;
         }
         ImGui::PopStyleColor();
+
+        // Solve button
+        if(!first_move) {
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.6f, 0.0f, 0.6f, 1.0f));  // Purple color
+            if (ImGui::Button("Solve")) {
+                board = solveGUI(board);
+            }
+            ImGui::PopStyleColor();
+        }
         
         // Popups for win and lose
         if(is_lost) {

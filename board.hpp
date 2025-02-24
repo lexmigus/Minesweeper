@@ -39,7 +39,11 @@ public:
     int numCols() {
         return cols;
     }
-
+    
+    int numMines() {
+        return totalMines;
+    }
+    
     // Places mines on the board
     void placeMines(int mines, int x, int y) {
         int mineCount = 0;
